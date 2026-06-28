@@ -1,0 +1,13 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "aws-knowledge"
+  ],
+  "disabledMcpjsonServers": [
+    "atlassian",
+    "playwright",
+    "playwright-headed",
+    "playwright-chrome",
+    "playwright-edge"
+  ]
+}

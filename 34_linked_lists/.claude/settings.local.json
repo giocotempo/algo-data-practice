@@ -1,0 +1,10 @@
+{
+  "enabledMcpjsonServers": [
+    "atlassian",
+    "aws-knowledge",
+    "playwright",
+    "playwright-headed",
+    "playwright-chrome",
+    "playwright-edge"
+  ]
+}
