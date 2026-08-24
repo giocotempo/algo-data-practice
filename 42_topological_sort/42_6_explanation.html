@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>42_6 Explanation</title>
+  <style>
+    :root {
+      --bg: #f6f1e8;
+      --panel: #fffaf2;
+      --text: #1f2933;
+      --muted: #52606d;
+      --accent: #0f766e;
+      --border: #d9cbb2;
+      --code: #f3eadb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top right, #efe2c7 0, transparent 28%),
+        linear-gradient(180deg, #f9f5ee 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 20px 72px;
+    }
+
+    h1, h2 {
+      line-height: 1.2;
+      margin: 0 0 16px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+    }
+
+    h2 {
+      margin-top: 36px;
+      font-size: 1.45rem;
+      color: var(--accent);
+    }
+
+    p, li {
+      font-size: 1.05rem;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 18px 40px rgba(31, 41, 51, 0.06);
+      margin-top: 20px;
+    }
+
+    code, pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.95rem;
+    }
+
+    code {
+      background: var(--code);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    pre {
+      background: var(--code);
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      white-space: pre-wrap;
+    }
+
+    .note {
+      color: var(--muted);
+    }
+
+    .answer {
+      border-left: 4px solid var(--accent);
+      padding-left: 16px;
+    }
+
+    .diagram {
+      margin-top: 18px;
+      padding: 18px;
+      background: #fcf6eb;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .diagram-label {
+      font-size: 0.98rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .legend {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #fffaf2;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+
+    .legend p {
+      margin: 6px 0;
+      font-size: 0.98rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Questions About <code>42_6_longest_path_of_increasing_degrees.py</code></h1>
+
+    <div class="card">
+      <p>
+        The key idea of this file is:
+        start from an <strong>undirected graph</strong>,
+        then give each edge a direction from
+        <strong>smaller degree</strong> to <strong>larger degree</strong>.
+      </p>
+      <p>
+        After that, the code treats the result like a DAG and computes the longest path.
+      </p>
+    </div>
+
+    <h2>1. What does <code>dag_neighbors</code> do?</h2>
+    <div class="card answer">
+      <pre><code>def dag_neighbors(graph, node):
+    return [nbr for nbr in graph[node] if len(graph[nbr]) > len(graph[node])]</code></pre>
+
+      <p>
+        It returns only the neighbors whose degree is <strong>strictly larger</strong> than the current node's degree.
+      </p>
+
+      <p>
+        So if node <code>u</code> is connected to node <code>v</code>, then:
+      </p>
+      <ul>
+        <li>if <code>degree(v) &gt; degree(u)</code>, keep the direction <code>u -&gt; v</code></li>
+        <li>otherwise, do not include <code>v</code> in <code>dag_neighbors(u)</code></li>
+      </ul>
+
+      <p>
+        In other words, <code>dag_neighbors</code> builds the "forward edges" of the DAG.
+      </p>
+
+      <div class="diagram">
+        <svg viewBox="0 0 760 280" role="img" aria-label="Diagram showing an undirected edge becoming a directed edge toward the larger-degree node">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#0f766e"></path>
+            </marker>
+          </defs>
+          <text x="40" y="36" font-size="24" fill="#1f2933" font-family="Georgia">Original undirected edge</text>
+          <circle cx="130" cy="120" r="34" fill="#efe2c7" stroke="#d9cbb2" stroke-width="2"></circle>
+          <circle cx="310" cy="120" r="34" fill="#efe2c7" stroke="#d9cbb2" stroke-width="2"></circle>
+          <line x1="164" y1="120" x2="276" y2="120" stroke="#1f2933" stroke-width="4"></line>
+          <text x="113" y="126" font-size="26" fill="#1f2933" font-family="Georgia">u</text>
+          <text x="294" y="126" font-size="26" fill="#1f2933" font-family="Georgia">v</text>
+          <text x="103" y="86" font-size="16" fill="#52606d" font-family="Georgia">node u</text>
+          <text x="283" y="86" font-size="16" fill="#52606d" font-family="Georgia">node v</text>
+          <text x="74" y="176" font-size="18" fill="#52606d" font-family="Georgia">degree(u) = 2</text>
+          <text x="252" y="176" font-size="18" fill="#52606d" font-family="Georgia">degree(v) = 5</text>
+          <text x="146" y="112" font-size="16" fill="#52606d" font-family="Georgia">undirected edge</text>
+
+          <text x="430" y="36" font-size="24" fill="#1f2933" font-family="Georgia">What `dag_neighbors(u)` keeps</text>
+          <circle cx="520" cy="120" r="34" fill="#d7f0e8" stroke="#82c7b8" stroke-width="2"></circle>
+          <circle cx="700" cy="120" r="34" fill="#d7f0e8" stroke="#82c7b8" stroke-width="2"></circle>
+          <line x1="554" y1="120" x2="666" y2="120" stroke="#0f766e" stroke-width="4" marker-end="url(#arrow)"></line>
+          <text x="503" y="126" font-size="26" fill="#1f2933" font-family="Georgia">u</text>
+          <text x="684" y="126" font-size="26" fill="#1f2933" font-family="Georgia">v</text>
+          <text x="492" y="86" font-size="16" fill="#52606d" font-family="Georgia">current node</text>
+          <text x="669" y="86" font-size="16" fill="#52606d" font-family="Georgia">kept neighbor</text>
+          <text x="564" y="108" font-size="16" fill="#52606d" font-family="Georgia">directed edge</text>
+          <text x="492" y="176" font-size="18" fill="#52606d" font-family="Georgia">smaller degree</text>
+          <text x="670" y="176" font-size="18" fill="#52606d" font-family="Georgia">larger degree</text>
+          <text x="456" y="228" font-size="18" fill="#1f2933" font-family="Georgia">Rule:</text>
+          <text x="506" y="228" font-size="18" fill="#52606d" font-family="Georgia">keep v only if degree(v) &gt; degree(u)</text>
+        </svg>
+        <p class="diagram-label">
+          Read this left to right. The original graph has edge <code>u - v</code>. Since <code>degree(v) &gt; degree(u)</code>, the algorithm keeps only the forward direction <code>u -&gt; v</code>.
+        </p>
+        <div class="legend">
+          <p><strong>Circle:</strong> a node in the graph</p>
+          <p><strong>Line without arrow:</strong> original undirected edge</p>
+          <p><strong>Arrow:</strong> edge kept by <code>dag_neighbors</code></p>
+          <p><strong>Colors:</strong> only for visual separation; the meaning comes from the text labels, not from color</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Why is this needed?</h2>
+    <div class="card answer">
+      <p>
+        The original graph is undirected, so it may contain cycles.
+        Longest path is hard in a general cyclic graph.
+      </p>
+
+      <p>
+        But if we only move from lower degree to higher degree, degrees must keep increasing along the path:
+      </p>
+      <pre><code>degree(a) &lt; degree(b) &lt; degree(c) &lt; ...</code></pre>
+
+      <p>
+        That means you can never come back to an earlier node, because coming back would force the degrees to go down again.
+        So this orientation removes cycles and gives a DAG-like direction to the graph.
+      </p>
+
+      <p>
+        Then topological sort and dynamic programming become possible.
+      </p>
+    </div>
+
+    <h2>Small example</h2>
+    <div class="card">
+      <p>Suppose:</p>
+      <ul>
+        <li><code>degree(0) = 1</code></li>
+        <li><code>degree(1) = 3</code></li>
+        <li><code>degree(2) = 4</code></li>
+      </ul>
+
+      <p>
+        If the undirected edges are <code>0-1</code> and <code>1-2</code>, then:
+      </p>
+      <ul>
+        <li><code>dag_neighbors(0) = [1]</code></li>
+        <li><code>dag_neighbors(1) = [2]</code></li>
+        <li><code>dag_neighbors(2) = []</code></li>
+      </ul>
+
+      <p>
+        So the code effectively turns the graph into:
+      </p>
+      <pre><code>0 -&gt; 1 -&gt; 2</code></pre>
+
+      <div class="diagram">
+        <svg viewBox="0 0 760 230" role="img" aria-label="Diagram showing a chain of nodes with increasing degree from left to right">
+          <defs>
+            <marker id="arrow-2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#0f766e"></path>
+            </marker>
+          </defs>
+          <text x="54" y="34" font-size="20" fill="#1f2933" font-family="Georgia">Degrees increase as we move right</text>
+          <circle cx="130" cy="90" r="34" fill="#efe2c7" stroke="#d9cbb2" stroke-width="2"></circle>
+          <circle cx="380" cy="90" r="34" fill="#efe2c7" stroke="#d9cbb2" stroke-width="2"></circle>
+          <circle cx="630" cy="90" r="34" fill="#efe2c7" stroke="#d9cbb2" stroke-width="2"></circle>
+          <line x1="164" y1="90" x2="346" y2="90" stroke="#0f766e" stroke-width="4" marker-end="url(#arrow-2)"></line>
+          <line x1="414" y1="90" x2="596" y2="90" stroke="#0f766e" stroke-width="4" marker-end="url(#arrow-2)"></line>
+          <text x="116" y="97" font-size="26" fill="#1f2933" font-family="Georgia">0</text>
+          <text x="366" y="97" font-size="26" fill="#1f2933" font-family="Georgia">1</text>
+          <text x="616" y="97" font-size="26" fill="#1f2933" font-family="Georgia">2</text>
+          <text x="107" y="62" font-size="16" fill="#52606d" font-family="Georgia">start</text>
+          <text x="357" y="62" font-size="16" fill="#52606d" font-family="Georgia">middle</text>
+          <text x="610" y="62" font-size="16" fill="#52606d" font-family="Georgia">next</text>
+          <text x="84" y="148" font-size="18" fill="#52606d" font-family="Georgia">degree = 1</text>
+          <text x="334" y="148" font-size="18" fill="#52606d" font-family="Georgia">degree = 3</text>
+          <text x="584" y="148" font-size="18" fill="#52606d" font-family="Georgia">degree = 4</text>
+          <text x="204" y="78" font-size="16" fill="#52606d" font-family="Georgia">keep 0 -&gt; 1</text>
+          <text x="454" y="78" font-size="16" fill="#52606d" font-family="Georgia">keep 1 -&gt; 2</text>
+          <text x="86" y="194" font-size="18" fill="#1f2933" font-family="Georgia">Path allowed by the rule: 0 -&gt; 1 -&gt; 2</text>
+        </svg>
+        <div class="legend">
+          <p><strong>Important:</strong> this path is allowed because each next node has a larger degree than the previous one.</p>
+          <p><strong>Why no backward arrow?</strong> Going from <code>2</code> back to <code>1</code> would decrease degree, so the algorithm does not keep that direction.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>2. Why does <code>if lengths[node] + 1 &gt; lengths[nbr]</code> work?</h2>
+    <div class="card answer">
+      <pre><code>if lengths[node] + 1 > lengths[nbr]:
+    lengths[nbr] = lengths[node] + 1</code></pre>
+
+      <p>
+        <code>lengths[x]</code> means:
+        <strong>the longest increasing-degree path found so far that ends at node <code>x</code></strong>.
+      </p>
+
+      <p>
+        If there is an edge <code>node -&gt; nbr</code>, then any path ending at <code>node</code> can be extended by one more edge to reach <code>nbr</code>.
+        So the new candidate length is:
+      </p>
+      <pre><code>lengths[node] + 1</code></pre>
+
+      <p>
+        The condition checks whether this new path is better than the best path currently known for <code>nbr</code>.
+      </p>
+      <ul>
+        <li>if it is bigger, update <code>lengths[nbr]</code></li>
+        <li>if it is not bigger, keep the old value</li>
+      </ul>
+
+      <p>
+        This is standard dynamic programming:
+        for each node, keep the best answer seen so far.
+      </p>
+
+      <div class="diagram">
+        <svg viewBox="0 0 760 340" role="img" aria-label="Diagram showing two possible incoming paths to a node and selecting the longer one">
+          <defs>
+            <marker id="arrow-3" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#0f766e"></path>
+            </marker>
+          </defs>
+          <text x="46" y="34" font-size="22" fill="#1f2933" font-family="Georgia">Two different previous nodes both lead to node 5</text>
+          <circle cx="160" cy="70" r="34" fill="#d7f0e8" stroke="#82c7b8" stroke-width="2"></circle>
+          <circle cx="160" cy="190" r="34" fill="#efe2c7" stroke="#d9cbb2" stroke-width="2"></circle>
+          <circle cx="560" cy="130" r="38" fill="#fff2cc" stroke="#e1b956" stroke-width="2"></circle>
+          <line x1="194" y1="78" x2="520" y2="120" stroke="#0f766e" stroke-width="4" marker-end="url(#arrow-3)"></line>
+          <line x1="194" y1="182" x2="520" y2="140" stroke="#b7791f" stroke-width="4" marker-end="url(#arrow-3)"></line>
+          <text x="146" y="77" font-size="24" fill="#1f2933" font-family="Georgia">1</text>
+          <text x="146" y="197" font-size="24" fill="#1f2933" font-family="Georgia">3</text>
+          <text x="546" y="137" font-size="24" fill="#1f2933" font-family="Georgia">5</text>
+          <text x="120" y="36" font-size="16" fill="#52606d" font-family="Georgia">node 1</text>
+          <text x="120" y="242" font-size="16" fill="#52606d" font-family="Georgia">node 3</text>
+          <text x="534" y="82" font-size="16" fill="#52606d" font-family="Georgia">node 5</text>
+          <text x="58" y="36" font-size="18" fill="#52606d" font-family="Georgia">lengths[1] = 2</text>
+          <text x="58" y="238" font-size="18" fill="#52606d" font-family="Georgia">lengths[3] = 1</text>
+          <text x="274" y="76" font-size="18" fill="#0f766e" font-family="Georgia">candidate through node 1: 2 + 1 = 3</text>
+          <text x="274" y="188" font-size="18" fill="#8a5a12" font-family="Georgia">candidate through node 3: 1 + 1 = 2</text>
+          <text x="450" y="220" font-size="18" fill="#52606d" font-family="Georgia">compare the two candidates</text>
+          <text x="454" y="250" font-size="20" fill="#1f2933" font-family="Georgia">3 &gt; 2, so store 3 in lengths[5]</text>
+          <text x="42" y="292" font-size="18" fill="#1f2933" font-family="Georgia">Meaning of the code:</text>
+          <text x="226" y="292" font-size="18" fill="#52606d" font-family="Georgia">if new path to nbr is longer than old path to nbr, replace it</text>
+        </svg>
+        <p class="diagram-label">
+          This diagram is about the single line <code>if lengths[node] + 1 &gt; lengths[nbr]</code>. The algorithm tests a new candidate path, compares it with the old best answer for <code>nbr</code>, and keeps the larger one.
+        </p>
+        <div class="legend">
+          <p><strong><code>lengths[1] = 2</code>:</strong> the best path ending at node <code>1</code> currently has length 2</p>
+          <p><strong><code>+ 1</code>:</strong> one more edge is added when moving from the current node to its neighbor</p>
+          <p><strong>Comparison:</strong> if the new candidate is larger, update; otherwise leave the old value unchanged</p>
+          <p><strong>Colors:</strong> the top and bottom arrows use different colors only to separate the two candidate paths</p>
+        </div>
+      </div>
+    </div>
+
+    <h2>Example for the condition</h2>
+    <div class="card">
+      <p>Suppose we already know:</p>
+      <ul>
+        <li><code>lengths[1] = 2</code></li>
+        <li><code>lengths[3] = 1</code></li>
+        <li>both <code>1</code> and <code>3</code> have an edge to <code>5</code></li>
+      </ul>
+
+      <p>
+        Then from node <code>1</code>, we can make a path to <code>5</code> of length <code>3</code>.
+        From node <code>3</code>, we can make a path to <code>5</code> of length <code>2</code>.
+      </p>
+
+      <pre><code>from 1: lengths[1] + 1 = 3
+from 3: lengths[3] + 1 = 2</code></pre>
+
+      <p>
+        We should keep the better one, so <code>lengths[5]</code> should become <code>3</code>, not <code>2</code>.
+        That is exactly why the condition uses <code>&gt;</code>.
+      </p>
+    </div>
+
+    <h2>Short summary</h2>
+    <div class="card">
+      <ul>
+        <li><code>dag_neighbors</code> keeps only edges that go from lower degree to higher degree.</li>
+        <li>This is needed so the undirected graph can be treated like a DAG.</li>
+        <li><code>lengths[node] + 1</code> means "extend the best path to <code>node</code> by one edge".</li>
+        <li>The <code>&gt;</code> check means "only update if this gives a better path for <code>nbr</code>".</li>
+      </ul>
+      <p class="note">
+        One subtle point: if two adjacent nodes have the same degree, this code ignores that edge because it uses a strict <code>&gt;</code>.
+      </p>
+    </div>
+  </main>
+</body>
+</html>

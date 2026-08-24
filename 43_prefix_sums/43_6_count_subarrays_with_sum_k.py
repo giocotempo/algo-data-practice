@@ -1,15 +1,15 @@
 def count_subarrays_with_sum_k(arr: list[int], k: int)->int:
+  prefix_sum = [arr[0]]
+  for i in range(1, len(arr)):
+    prefix_sum.append(prefix_sum[i-1] + arr[i])
+
   count = 0
-  l, r = 0, 0
-  
-  while r < len(arr):
-    if sum(arr[l:r + 1]) == k:
+  for i in range(len(arr)):
+    if prefix_sum[i] == k:
       count += 1
-      l += 1
-    elif sum(arr[l:r + 1]) > k:
-      l += 1
-    else:
-      r += 1
+    for j in range(i):
+      if prefix_sum[i] - prefix_sum[j] == k:
+        count += 1
   
   return count
 
